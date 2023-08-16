@@ -3,22 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeslaCraft API</title>
+  <title>Профиль TeslaCraft</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <div id="input-container">
-      <h1>Информация о профиле</h1>
+      <h1>Информация о профиле<br>на сервере TeslaCraft</h1>
       <input type="text" id="username" placeholder="Введите свой никнейм">
-      <button onclick="fetchData()">Узнать!</button>
+      <button onclick="fetchData()">Продолжить</button>
     </div>
     <div id="profile-container">
       <div id="profile-info">
         <h2 id="profile-nickname"></h2>
         <img id="profile-picture" src="" alt="Profile-picture">
       </div>
-      <div id="profile-details">
+      <div id="profile-details"></div>
+      <div id="profile-ratings">
+        <p><b>Самые получаемые рейтинги</b></p>
+        <div id="ratings-container"></div>
       </div>
     </div>
   </div>
