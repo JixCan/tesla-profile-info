@@ -8,10 +8,19 @@
 </head>
 <body>
   <div class="container">
-    <h1>TeslaCraft API</h1>
-    <input type="text" id="username" placeholder="Enter your username">
-    <button onclick="fetchData()">Fetch Data</button>
-    <div id="response"></div>
+    <div id="input-container">
+      <h1>Информация о профиле</h1>
+      <input type="text" id="username" placeholder="Введите свой никнейм">
+      <button onclick="fetchData()">Узнать!</button>
+    </div>
+    <div id="profile-container">
+      <div id="profile-info">
+        <h2 id="profile-nickname"></h2>
+        <img id="profile-picture" src="" alt="Profile-picture">
+      </div>
+      <div id="profile-details">
+      </div>
+    </div>
   </div>
   <script src="script.js"></script>
 </body>
