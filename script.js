@@ -1,7 +1,7 @@
 function fetchData() {
   const username = document.getElementById('username').value;
   
-  fetch(`https://api.saienterprises.ru/v2/apiTeslaCraft/${username}`)
+  fetch(`https://api.saienterprises.ru/v2/teslaProfile/${username}`)
     .then(response => response.json())
     .then(data => {
 
