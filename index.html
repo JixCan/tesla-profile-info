@@ -7,21 +7,51 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <div class="overlay" id="overlay"></div>
+  <div class="popup" id="popup">
     <div id="input-container">
       <h1>Информация о профиле<br>на сервере TeslaCraft</h1>
       <input type="text" id="username" placeholder="Введите свой никнейм">
-      <button onclick="fetchData()">Продолжить</button>
+      <button onclick="closePopupAndFetch()">Продолжить</button>
     </div>
-    <div id="profile-container">
-      <div id="profile-info">
+  </div>
+  <div class="profile-container" id="profile-container">
+    <div class="profile-box">
+      <div class="profile-info" id="profile-info">
         <h2 id="profile-nickname"></h2>
         <img id="profile-picture" src="" alt="Profile-picture">
       </div>
-      <div id="profile-details"></div>
-      <div id="profile-ratings">
-        <p><b>Самые получаемые рейтинги</b></p>
-        <div id="ratings-container"></div>
+      <div class="profile-details" id="profile-details">
+        details
+      </div>
+      <div class="profile-ratings">
+        <div id="profile-ratings">
+          <p><b>Самые получаемые рейтинги</b></p>
+          <div id="ratings-container"></div>
+        </div>
+      </div>
+    </div>
+    <div class="profile-stats" id="profile-stats">
+      <div id="loading-indicator" class="loading-indicator">
+        <div class="spinner"></div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-item">Stat 1</div>
+        <div class="stat-item">Stat 2</div>
+        <div class="stat-item">Stat 3</div>
+        <div class="stat-item">Stat 4</div>
+        <div class="stat-item">Stat 5</div>
+        <div class="stat-item">Stat 6</div>
+        <div class="stat-item">Stat 7</div>
+        <div class="stat-item">Stat 8</div>
+        <div class="stat-item">Stat 9</div>
+        <div class="stat-item">Stat 10</div>
+        <div class="stat-item">Stat 11</div>
+        <div class="stat-item">Stat 12</div>
+        <div class="stat-item">Stat 13</div>
+        <div class="stat-item">Stat 14</div>
+        <div class="stat-item">Stat 15</div>
+        <div class="stat-item">Stat 16</div>
       </div>
     </div>
   </div>

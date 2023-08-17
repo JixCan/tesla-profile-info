@@ -1,21 +1,38 @@
 function fetchData() {
   const username = document.getElementById('username').value;
   
+  const profileStats = document.getElementById('profile-stats');
+  const loadingIndicator = document.getElementById('loading-indicator');
+  loadingIndicator.style.display = "block";
+  profileStats.style.filter = "blur(0px)";
+  
+  fetch(`https://api.saienterprises.ru/v2/teslaStatistic/${username}`)
+  .then(response => response.json())
+  .then(data => {
+    
+    fillStats(data);
+    profileStats.style.filter = "none";
+    loadingIndicator.style.display = "none";
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+  });
+
+
   fetch(`https://api.saienterprises.ru/v2/teslaProfile/${username}`)
     .then(response => response.json())
     .then(data => {
 
       const profile = data[0].profile;
       
-      const profileContainer = document.getElementById('profile-container');
+      
       const profileNickname = document.getElementById('profile-nickname');
       const profilePicture = document.getElementById('profile-picture');
       profilePicture.src = profile.avatarImageUrl;
       const profileDetails = document.getElementById('profile-details');
-      const ratingsContainer = document.getElementById('ratings-container');
-      const inputContainer = document.getElementById('input-container')
-      inputContainer.style.display = 'none';
 
+      const ratingsContainer = document.getElementById('ratings-container');
+      
       profileNickname.textContent = profile.nickname;
       profileDetails.innerHTML = `
       <p>Дата регистрации: ${new Date(profile.registration).toLocaleDateString()}</p>
@@ -32,8 +49,6 @@ function fetchData() {
       <p>Звание: ${profile.rankForum}</p>
     `;
     
-
-
       const profileRatings = profile.ratings;
       const allRatings = Object.entries(profileRatings).map(([rating, values]) => ({
         rating,
@@ -44,7 +59,6 @@ function fetchData() {
       
       const topThreeRatings = allRatings.slice(0, 3);
 
-      // Добавление рейтингов в одну строку
       ratingsContainer.innerHTML = '';
 
       function appendRatingElement(imagePath, received) {
@@ -70,10 +84,53 @@ function fetchData() {
         const imagePath = `./rating-icons/${rating.toLowerCase()}.png`;
         appendRatingElement(imagePath, received);
       }
-      
-      profileContainer.style.display = 'block';
     })
     .catch(error => {
       console.error('Error fetching data:', error);
     });
 }
+
+function openPopup() {
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("popup").style.display = "block";
+}
+
+function closePopupAndFetch() {
+  const username = document.getElementById("username").value;
+  if (username.trim() !== "") {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("popup").style.display = "none";
+    fetchData();
+  }
+}
+
+function fillStats(response) {
+  const statItems = document.querySelectorAll('.stat-item');
+  const modeKeys = Object.keys(response).filter(key => key !== 'nickname');
+
+  for (let index = 0; index < statItems.length; index++) {
+    const statItem = statItems[index];
+    const mode = modeKeys[index];
+    const modeStats = response[mode];
+    
+    statItem.innerHTML = '';
+    
+    const modeTitle = document.createElement('h3');
+    modeTitle.textContent = mode;
+    statItem.appendChild(modeTitle);
+
+    for (const stat in modeStats) {
+      const value = modeStats[stat];
+      const statInfo = document.createElement('p');
+      statInfo.textContent = `${stat} ${value}`;
+      statItem.appendChild(statInfo);
+    }
+  }
+}
+
+
+window.onload = function() {
+  openPopup();
+};
+
+
