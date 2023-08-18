@@ -1,6 +1,8 @@
 function fetchData() {
   const username = document.getElementById('username').value;
   const errorMessage = document.getElementById('error-message');
+  const progressBar = document.querySelector('.progress-bar');
+  progressBar.style.width = `0%`;
   errorMessage.textContent = '';
   
   fetch(`https://api.saienterprises.ru/v2/teslaStatistic/${username}`)
@@ -14,7 +16,7 @@ function fetchData() {
       fillStats(data);
     })
     .catch(error => {
-      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует?";
+      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует.";
       errorMessage.style.display = "block";
     });
 
@@ -52,7 +54,33 @@ function fetchData() {
         <p>Баллов: ${parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]?.replace(/\s+/g, ''), 10) || 0}</p>
         <p>Звание: ${profile.rankForum}</p>
       `;
-    
+      
+      const positiveRatings = parseInt(profile.forumData?.positiveRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Положительные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0;
+      const messages = parseInt(profile.forumData?.messages?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Сообщения:"]?.replace(/\s+/g, ''), 10) || 0;
+      const points = parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]?.replace(/\s+/g, ''), 10) || 0;
+      const registrationDate = new Date(profile.registration)
+
+      const currentDate = new Date();
+      const threeYearsAgo = new Date(currentDate);
+      threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+
+      let progress = 0;
+      if (points < 300) {
+      const ratingsPercentage = positiveRatings / 7000;
+      const messagesPercentage = messages / 5000;
+      const timeDifference = currentDate - registrationDate;
+      const threeYearsInMilliseconds = 3 * 365 * 24 * 60 * 60 * 1000;
+
+      const timePercentage = (timeDifference >= threeYearsInMilliseconds) ? 1 : timeDifference / threeYearsInMilliseconds;
+
+      progress = (ratingsPercentage + messagesPercentage + timePercentage) / 3 * 100;
+      progress = Math.min(progress, 100);
+      } else {
+        progress = 100;
+      }
+
+      progressBar.style.width = `${progress}%`;
+
       const profileRatings = profile.ratings;
       const allRatings = Object.entries(profileRatings).map(([rating, values]) => ({
         rating,
@@ -89,7 +117,7 @@ function fetchData() {
       }
     })
     .catch(error => {
-      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует?";
+      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует.";
       errorMessage.style.display = "block";
     });
 
