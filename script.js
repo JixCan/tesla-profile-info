@@ -2,17 +2,11 @@ function fetchData() {
   const username = document.getElementById('username').value;
   
   const profileStats = document.getElementById('profile-stats');
-  const loadingIndicator = document.getElementById('loading-indicator');
-  loadingIndicator.style.display = "block";
-  profileStats.style.filter = "blur(0px)";
   
   fetch(`https://api.saienterprises.ru/v2/teslaStatistic/${username}`)
   .then(response => response.json())
   .then(data => {
-    
     fillStats(data);
-    profileStats.style.filter = "none";
-    loadingIndicator.style.display = "none";
   })
   .catch(error => {
     console.error('Error fetching data:', error);
@@ -104,30 +98,103 @@ function closePopupAndFetch() {
   }
 }
 
+const modeNames = {
+  BEDWARS: 'БедВарс',
+  BUILD_BATTLE: 'Битва строителей',
+  HUNGER_GAMES: 'Голодные игры',
+  CROCODILE: 'Крокодил',
+  SHEEP_WARS: 'Овечки',
+  HIDE_AND_SEEK: 'Прятки',
+  SKY_WARS: 'СкайВарс',
+  SPEED_BUILDERS: 'СпидБилдерс',
+  TNT_RUN: 'ТнтРан',
+  ANNIHILATION: 'Аннексия',
+  FAST_BEDWARS: 'Быстрый БедВарс',
+  MIX_GAME: 'МиксГейм',
+  MURDER_MYSTERY: 'Тайна убийства',
+  CLASSIC_SURVIVAL: 'Классическое Выживание',
+  COUNTER_STRIKE: 'Контр-Страйк',
+  DEATH_RUN: 'ДезРан'
+};
+
+const coefficientCalculations = {
+  BEDWARS: { key1: 'Убийств:', key2: 'Смертей:', label: 'Коэффициент У/С' },
+  BUILD_BATTLE: { key1: 'Побед:', key2: 'Сыгранных партий:', label: 'Винрейт' },
+  HUNGER_GAMES: { key1: 'Убийств:', key2: 'Смертей:', label: 'Коэффициент У/С' },
+  CROCODILE: { key1: 'Победы:', key2: 'Поражения:', label: 'Винрейт' },
+  SKY_WARS: { key1: 'Убийств:', key2: 'Смертей:', label: 'Коэффициент У/С' },
+  TNT_RUN: { key1: 'Побед:', key2: 'Сыгранных партий:', label: 'Винрейт' },
+  FAST_BEDWARS: { key1: 'Убийств:', key2: 'Смертей:', label: 'Коэффициент У/С' },
+  MIX_GAME: { key1: 'Побед:', key2: 'Поражений:', label: 'Винрейт' },
+  COUNTER_STRIKE: { key1: 'Убийств:', key2: 'Смертей:', label: 'Коэффициент У/С' },
+  DEATH_RUN: { key1: 'Побед:', key2: 'Сыгранных партий:', label: 'Винрейт' }
+};
+
+
 function fillStats(response) {
   const statItems = document.querySelectorAll('.stat-item');
   const modeKeys = Object.keys(response).filter(key => key !== 'nickname');
+
+  const keysToShow = {
+    BEDWARS: ['Очков:', 'Побед:', 'Убийств:'],
+    BUILD_BATTLE: ['Побед:', 'Сыгранных партий:'],
+    HUNGER_GAMES: ['Побед:', 'Убийств:'],
+    CROCODILE: ['Очки:', 'Победы:'],
+    SHEEP_WARS: ['Побед:', 'Убийств:', 'Коэффициент У/C:'],
+    HIDE_AND_SEEK: ['Побед:', 'Убито хайдеров:', 'Убито охотников:'],
+    SKY_WARS: ['Побед:', 'Убийств:'],
+    SPEED_BUILDERS: ['Победы:', 'Идеальные постройки:'],
+    TNT_RUN: ['Побед:', 'Поражений:'],
+    ANNIHILATION: ['Побед:', 'Убийств:'],
+    FAST_BEDWARS: ['Очков:', 'Побед:', 'Убийств:'],
+    MIX_GAME: ['Побед:', 'Лучшее время:', 'Лучший уровень:'],
+    MURDER_MYSTERY: ['Побед:', 'Убийств:', 'Очков:'],
+    CLASSIC_SURVIVAL: ['Часов на режиме:' ,'Убито игроков:', 'Убито мобов:'],
+    COUNTER_STRIKE: ['Побед:', 'Убийств:', 'Хэдшотов:'],
+    DEATH_RUN: ['Очков:', 'Побед:', 'Убийств:']
+  };
 
   for (let index = 0; index < statItems.length; index++) {
     const statItem = statItems[index];
     const mode = modeKeys[index];
     const modeStats = response[mode];
-    
+    const keys = keysToShow[mode] || Object.keys(modeStats); // Если нет настроенных ключей, покажите все
+
     statItem.innerHTML = '';
     
-    const modeTitle = document.createElement('h3');
-    modeTitle.textContent = mode;
-    statItem.appendChild(modeTitle);
+    const modeImage = document.createElement('img');
+    modeImage.className = "minigame-icon";
+    modeImage.src = `./minigame-icons/${mode}.jpg`;
+    modeImage.alt = mode;
+    statItem.appendChild(modeImage);
 
-    for (const stat in modeStats) {
+    for (const stat of keys) {
       const value = modeStats[stat];
       const statInfo = document.createElement('p');
       statInfo.textContent = `${stat} ${value}`;
       statItem.appendChild(statInfo);
     }
+
+    if (coefficientCalculations[mode]) {
+      const { key1, key2, label } = coefficientCalculations[mode];
+      const value1 = modeStats[key1];
+      const value2 = modeStats[key2];
+      if (value1 && value2) {
+        const coefficient = calculateCoefficient(value1, value2);
+        const coefficientInfo = document.createElement('p');
+        coefficientInfo.textContent = `${label}: ${coefficient}`;
+        statItem.appendChild(coefficientInfo);
+      }
+    }
+    
   }
 }
 
+function calculateCoefficient(value1, value2) {
+  const num1 = parseInt(value1);
+  const num2 = parseInt(value2);
+  return (num2 !== 0) ? (num1 / num2).toFixed(2) : num1.toFixed(2);
+}
 
 window.onload = function() {
   openPopup();
