@@ -1,24 +1,34 @@
 function fetchData() {
   const username = document.getElementById('username').value;
-  
-  const profileStats = document.getElementById('profile-stats');
+  const errorMessage = document.getElementById('error-message');
+  errorMessage.textContent = '';
   
   fetch(`https://api.saienterprises.ru/v2/teslaStatistic/${username}`)
-  .then(response => response.json())
-  .then(data => {
-    fillStats(data);
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error);
-  });
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error fetching data: Server returnedв ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      fillStats(data);
+    })
+    .catch(error => {
+      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует?";
+      errorMessage.style.display = "block";
+    });
+
 
 
   fetch(`https://api.saienterprises.ru/v2/teslaProfile/${username}`)
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error fetching data: Server returnedв ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
-
       const profile = data[0].profile;
-      
       
       const profileNickname = document.getElementById('profile-nickname');
       const profilePicture = document.getElementById('profile-picture');
@@ -29,19 +39,19 @@ function fetchData() {
       
       profileNickname.textContent = profile.nickname;
       profileDetails.innerHTML = `
-      <p>Дата регистрации: ${new Date(profile.registration).toLocaleDateString()}</p>
-      <p>Сообщений: ${parseInt(profile.forumData.messages?.replace(/\s+/g, ''), 10) ?? 0}</p>
-      <p>Рейтинги: 
-        <font color="#62A201">${parseInt(profile.forumData.positiveRatings?.replace(/\s+/g, ''), 10) ?? 0}</font>
-        <font color="#767676"> / </font>
-        <font color="#2980B9">${parseInt(profile.forumData.neutralRatings?.replace(/\s+/g, ''), 10) ?? 0}</font>
-        <font color="#767676"> / </font>
-        <font color="#D90B00">${parseInt(profile.forumData.negativeRatings?.replace(/\s+/g, ''), 10) ?? 0}</font>
-      </p>
-      <p>Достижений: ${profile.achievements}</p>
-      <p>Баллов: ${parseInt(profile.forumData.points, 10) ?? 0}</p>
-      <p>Звание: ${profile.rankForum}</p>
-    `;
+        <p>Дата регистрации: ${new Date(profile.registration).toLocaleDateString()}</p>
+        <p>Сообщений: ${parseInt(profile.forumData?.messages?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Сообщения:"]?.replace(/\s+/g, ''), 10) || 0}</p>
+        <p>Рейтинги: 
+          <font color="#62A201">${parseInt(profile.forumData?.positiveRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Положительные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0}</font>
+          <font color="#767676"> / </font>
+          <font color="#2980B9">${parseInt(profile.forumData?.neutralRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Нейтральные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0}</font>
+          <font color="#767676"> / </font>
+          <font color="#D90B00">${parseInt(profile.forumData?.negativeRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Отрицательные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0}</font>
+        </p>
+        <p>Достижений: ${profile.achievements}</p>
+        <p>Баллов: ${parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]?.replace(/\s+/g, ''), 10) || 0}</p>
+        <p>Звание: ${profile.rankForum}</p>
+      `;
     
       const profileRatings = profile.ratings;
       const allRatings = Object.entries(profileRatings).map(([rating, values]) => ({
@@ -73,15 +83,16 @@ function fetchData() {
         ratingsContainer.appendChild(container);
       }
       
-
       for (const { rating, received } of topThreeRatings) {
         const imagePath = `./rating-icons/${rating.toLowerCase()}.png`;
         appendRatingElement(imagePath, received);
       }
     })
     .catch(error => {
-      console.error('Error fetching data:', error);
+      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует?";
+      errorMessage.style.display = "block";
     });
+
 }
 
 function openPopup() {
@@ -95,6 +106,9 @@ function closePopupAndFetch() {
     document.getElementById("overlay").style.display = "none";
     document.getElementById("popup").style.display = "none";
     fetchData();
+    const errorMessage = document.getElementById('error-message');
+    const profileContainer = document.getElementById('profile-container');
+    profileContainer.style.display = 'flex';
   }
 }
 
