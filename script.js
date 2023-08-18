@@ -19,7 +19,21 @@ function fetchData() {
       errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует.";
       errorMessage.style.display = "block";
     });
-
+  
+  fetch(`https://api.saienterprises.ru/v2/teslaClans/${username}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Error fetching data: Server returnedв ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      createPositiveScoreChart(data);
+    })
+    .catch(error => {
+      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует.";
+      errorMessage.style.display = "block";
+    });
 
 
   fetch(`https://api.saienterprises.ru/v2/teslaProfile/${username}`)
@@ -66,8 +80,9 @@ function fetchData() {
 
       let progress = 0;
       if (points < 300) {
-      const ratingsPercentage = positiveRatings / 7000;
-      const messagesPercentage = messages / 5000;
+      const ratingsPercentage = (positiveRatings < 7000) ? positiveRatings / 7000 : 1;
+      const messagesPercentage =(messages < 5000) ? messages / 5000 : 1;
+
       const timeDifference = currentDate - registrationDate;
       const threeYearsInMilliseconds = 3 * 365 * 24 * 60 * 60 * 1000;
 
@@ -150,13 +165,14 @@ const modeNames = {
   SKY_WARS: 'СкайВарс',
   SPEED_BUILDERS: 'СпидБилдерс',
   TNT_RUN: 'ТнтРан',
-  ANNIHILATION: 'Аннексия',
+  ANNEXATION: 'Аннексия',
   FAST_BEDWARS: 'Быстрый БедВарс',
   MIX_GAME: 'МиксГейм',
   MURDER_MYSTERY: 'Тайна убийства',
   CLASSIC_SURVIVAL: 'Классическое Выживание',
   COUNTER_STRIKE: 'Контр-Страйк',
-  DEATH_RUN: 'ДезРан'
+  DEATH_RUN: 'ДезРан',
+  T_ARCADA: 'ТАркада'
 };
 
 const coefficientCalculations = {
@@ -187,7 +203,7 @@ function fillStats(response) {
     SKY_WARS: ['Побед:', 'Убийств:'],
     SPEED_BUILDERS: ['Победы:', 'Идеальные постройки:'],
     TNT_RUN: ['Побед:', 'Поражений:'],
-    ANNIHILATION: ['Побед:', 'Убийств:'],
+    ANNEXATION: ['Побед:', 'Убийств:'],
     FAST_BEDWARS: ['Очков:', 'Побед:', 'Убийств:'],
     MIX_GAME: ['Побед:', 'Лучшее время:', 'Лучший уровень:'],
     MURDER_MYSTERY: ['Побед:', 'Убийств:', 'Очков:'],
@@ -237,6 +253,36 @@ function calculateCoefficient(value1, value2) {
   const num2 = parseInt(value2);
   return (num2 !== 0) ? (num1 / num2).toFixed(2) : num1.toFixed(2);
 }
+
+
+function createPositiveScoreChart(response) {
+  const clanScoreData = response.clanScoreMinigame;
+  const chartContainer = document.querySelector('.profile-score-container .chart');
+
+  chartContainer.innerHTML = ''; // Очистить содержимое диаграммы
+
+  const sortedModes = Object.keys(clanScoreData)
+    .filter(mode => parseInt(clanScoreData[mode]) > 0)
+    .sort((a, b) => parseInt(clanScoreData[b]) - parseInt(clanScoreData[a]));
+
+  for (const mode of sortedModes) {
+    const value = parseInt(clanScoreData[mode]);
+    const percentage = (value / parseInt(response.clanscore)) * 100;
+
+    const pipeContainer = document.createElement('div');
+    pipeContainer.classList.add('pipe');
+
+    const pipe = document.createElement('div');
+    pipe.style.width = `${percentage}%`;
+    pipeContainer.appendChild(pipe);
+    const text = document.createElement('p');
+    text.textContent = modeNames[mode] + ` ${percentage.toFixed(2)}%`;
+    chartContainer.appendChild(text);
+    chartContainer.appendChild(pipeContainer);
+    
+  }
+}
+
 
 window.onload = function() {
   openPopup();
