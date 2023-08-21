@@ -55,24 +55,24 @@ function fetchData() {
       
       profileNickname.textContent = profile.nickname;
       profileDetails.innerHTML = `
-        <p>Дата регистрации: ${new Date(profile.registration).toLocaleDateString()}</p>
-        <p>Сообщений: ${parseInt(profile.forumData?.messages?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Сообщения:"]?.replace(/\s+/g, ''), 10) || 0}</p>
+        <p>Дата регистрации: ${new Date(profile.registration * 1000).toLocaleDateString()}</p>
+        <p>Сообщений: ${parseInt(profile.forumData?.messages) || parseInt(profile.metaData?.["Сообщения:"]?.replace(/\s+/g, ''), 10) || 0}</p>
         <p>Рейтинги: 
-          <font color="#62A201">${parseInt(profile.forumData?.positiveRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Положительные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0}</font>
+          <font color="#62A201">${parseInt(profile.forumData?.positiveRatings) || parseInt(profile.metaData?.["Положительные рейтинги:"]) || 0}</font>
           <font color="#767676"> / </font>
-          <font color="#2980B9">${parseInt(profile.forumData?.neutralRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Нейтральные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0}</font>
+          <font color="#2980B9">${parseInt(profile.forumData?.neutralRatings) || parseInt(profile.metaData?.["Нейтральные рейтинги:"]) || 0}</font>
           <font color="#767676"> / </font>
-          <font color="#D90B00">${parseInt(profile.forumData?.negativeRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Отрицательные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0}</font>
+          <font color="#D90B00">${parseInt(profile.forumData?.negativeRatings) || parseInt(profile.metaData?.["Отрицательные рейтинги:"]) || 0}</font>
         </p>
         <p>Достижений: ${profile.achievements}</p>
-        <p>Баллов: ${parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]?.replace(/\s+/g, ''), 10) || 0}</p>
+        <p>Баллов: ${parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]) || 0}</p>
         <p>Звание: ${profile.rankForum}</p>
       `;
       
-      const positiveRatings = parseInt(profile.forumData?.positiveRatings?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Положительные рейтинги:"]?.replace(/\s+/g, ''), 10) || 0;
-      const messages = parseInt(profile.forumData?.messages?.replace(/\s+/g, ''), 10) || parseInt(profile.metaData?.["Сообщения:"]?.replace(/\s+/g, ''), 10) || 0;
-      const points = parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]?.replace(/\s+/g, ''), 10) || 0;
-      const registrationDate = new Date(profile.registration)
+      const positiveRatings = parseInt(profile.forumData?.positiveRatings) || parseInt(profile.metaData?.["Положительные рейтинги:"]) || 0;
+      const messages = parseInt(profile.forumData?.messages) || parseInt(profile.metaData?.["Сообщения:"]) || 0;
+      const points = parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]) || 0;
+      const registrationDate = new Date(profile.registration * 1000)
 
       const currentDate = new Date();
       const threeYearsAgo = new Date(currentDate);
@@ -99,7 +99,7 @@ function fetchData() {
       const profileRatings = profile.ratings;
       const allRatings = Object.entries(profileRatings).map(([rating, values]) => ({
         rating,
-        received: parseInt(values["Получено"].replace(/\s+/g, ''), 10),
+        received: parseInt(values["Получено"]),
       }));
       
       allRatings.sort((a, b) => b.received - a.received);
