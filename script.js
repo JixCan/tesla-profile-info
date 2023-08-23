@@ -16,6 +16,7 @@ function fetchData() {
       fillStats(data);
     })
     .catch(error => {
+      
       errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует.";
       errorMessage.style.display = "block";
     });
@@ -31,7 +32,8 @@ function fetchData() {
       createPositiveScoreChart(data);
     })
     .catch(error => {
-      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь заблокирован или не существует.";
+      
+      errorMessage.textContent = "Произошла ошибка во время запроса к серверу. Возможно, указанный вами пользователь не существует, заблокирован или не состоит в клане.";
       errorMessage.style.display = "block";
     });
 
@@ -47,6 +49,7 @@ function fetchData() {
       const profile = data[0].profile;
       
       const profileNickname = document.getElementById('profile-nickname');
+      
       const profilePicture = document.getElementById('profile-picture');
       profilePicture.src = profile.avatarImageUrl;
       const profileDetails = document.getElementById('profile-details');
@@ -54,23 +57,26 @@ function fetchData() {
       const ratingsContainer = document.getElementById('ratings-container');
       
       profileNickname.textContent = profile.nickname;
+      const positiveRatings = parseInt(profile.forumData?.positiveRatings) || (profile.metaData?.["Положительные рейтинги:"] ? parseInt(profile.metaData["Положительные рейтинги:"].replace(/\s+/g, '')) : 0);
+      const neutralRatings = parseInt(profile.forumData?.neutralRatings) || (profile.metaData?.["Нейтральные рейтинги:"] ? parseInt(profile.metaData["Нейтральные рейтинги:"].replace(/\s+/g, '')) : 0);
+      const negativeRatings = parseInt(profile.forumData?.negativeRatings) || (profile.metaData?.["Отрицательные рейтинги:"] ? parseInt(profile.metaData["Отрицательные рейтинги:"].replace(/\s+/g, '')) : 0);
+      const messages = parseInt(profile.forumData?.messages) || (profile.metaData?.["Сообщения:"] ? parseInt(profile.metaData["Сообщения:"].replace(/\s+/g, '')) : 0);
+      
       profileDetails.innerHTML = `
         <p>Дата регистрации: ${new Date(profile.registration * 1000).toLocaleDateString()}</p>
-        <p>Сообщений: ${parseInt(profile.forumData?.messages) || parseInt(profile.metaData?.["Сообщения:"]?.replace(/\s+/g, ''), 10) || 0}</p>
+        <p>Сообщений: ${messages}</p>
         <p>Рейтинги: 
-          <font color="#62A201">${parseInt(profile.forumData?.positiveRatings) || parseInt(profile.metaData?.["Положительные рейтинги:"]) || 0}</font>
+          <font color="#62A201">${positiveRatings}</font>
           <font color="#767676"> / </font>
-          <font color="#2980B9">${parseInt(profile.forumData?.neutralRatings) || parseInt(profile.metaData?.["Нейтральные рейтинги:"]) || 0}</font>
+          <font color="#2980B9">${neutralRatings}</font>
           <font color="#767676"> / </font>
-          <font color="#D90B00">${parseInt(profile.forumData?.negativeRatings) || parseInt(profile.metaData?.["Отрицательные рейтинги:"]) || 0}</font>
+          <font color="#D90B00">${negativeRatings}</font>
         </p>
         <p>Достижений: ${profile.achievements}</p>
         <p>Баллов: ${parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]) || 0}</p>
         <p>Звание: ${profile.rankForum}</p>
       `;
       
-      const positiveRatings = parseInt(profile.forumData?.positiveRatings) || parseInt(profile.metaData?.["Положительные рейтинги:"]) || 0;
-      const messages = parseInt(profile.forumData?.messages) || parseInt(profile.metaData?.["Сообщения:"]) || 0;
       const points = parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]) || 0;
       const registrationDate = new Date(profile.registration * 1000)
 
@@ -81,7 +87,7 @@ function fetchData() {
       let progress = 0;
       if (points < 300) {
       const ratingsPercentage = (positiveRatings < 7000) ? positiveRatings / 7000 : 1;
-      const messagesPercentage =(messages < 5000) ? messages / 5000 : 1;
+      const messagesPercentage = (messages < 5000) ? messages / 5000 : 1;
 
       const timeDifference = currentDate - registrationDate;
       const threeYearsInMilliseconds = 3 * 365 * 24 * 60 * 60 * 1000;
@@ -95,6 +101,8 @@ function fetchData() {
       }
 
       progressBar.style.width = `${progress}%`;
+      const progressText = document.getElementById('progress-text');
+      progressText.textContent += ` (${progress.toFixed(2)}%)`
 
       const profileRatings = profile.ratings;
       const allRatings = Object.entries(profileRatings).map(([rating, values]) => ({
@@ -194,22 +202,22 @@ function fillStats(response) {
   const modeKeys = Object.keys(response).filter(key => key !== 'nickname');
 
   const keysToShow = {
-    BEDWARS: ['Очков:', 'Побед:', 'Убийств:'],
-    BUILD_BATTLE: ['Побед:', 'Сыгранных партий:'],
-    HUNGER_GAMES: ['Побед:', 'Убийств:'],
-    CROCODILE: ['Очки:', 'Победы:'],
-    SHEEP_WARS: ['Побед:', 'Убийств:', 'Коэффициент У/C:'],
-    HIDE_AND_SEEK: ['Побед:', 'Убито хайдеров:', 'Убито охотников:'],
-    SKY_WARS: ['Побед:', 'Убийств:'],
-    SPEED_BUILDERS: ['Победы:', 'Идеальные постройки:'],
-    TNT_RUN: ['Побед:', 'Поражений:'],
-    ANNEXATION: ['Побед:', 'Убийств:'],
-    FAST_BEDWARS: ['Очков:', 'Побед:', 'Убийств:'],
-    MIX_GAME: ['Побед:', 'Лучшее время:', 'Лучший уровень:'],
-    MURDER_MYSTERY: ['Побед:', 'Убийств:', 'Очков:'],
-    CLASSIC_SURVIVAL: ['Часов на режиме:' ,'Убито игроков:', 'Убито мобов:'],
-    COUNTER_STRIKE: ['Побед:', 'Убийств:', 'Хэдшотов:'],
-    DEATH_RUN: ['Очков:', 'Побед:', 'Убийств:']
+    BEDWARS: ['Очков', 'Побед', 'Убийств'],
+    BUILD_BATTLE: ['Побед', 'Сыгранных партий'],
+    HUNGER_GAMES: ['Побед', 'Убийств'],
+    CROCODILE: ['Очков', 'Побед'],
+    SHEEP_WARS: ['Побед', 'Убийств', 'Коэффициент У/C'],
+    HIDE_AND_SEEK: ['Побед', 'Убито хайдеров', 'Убито охотников'],
+    SKY_WARS: ['Побед', 'Убийств'],
+    SPEED_BUILDERS: ['Побед', 'Идеальные постройки'],
+    TNT_RUN: ['Побед', 'Поражений'],
+    ANNEXATION: ['Побед', 'Убийств'],
+    FAST_BEDWARS: ['Очков', 'Побед', 'Убийств'],
+    MIX_GAME: ['Побед', 'Лучшее время', 'Лучший уровень'],
+    MURDER_MYSTERY: ['Побед', 'Убийств', 'Очков'],
+    CLASSIC_SURVIVAL: ['Часов на режиме' ,'Убито игроков', 'Убито мобов'],
+    COUNTER_STRIKE: ['Побед', 'Убийств', 'Хэдшотов'],
+    DEATH_RUN: ['Очков', 'Побед', 'Убийств']
   };
 
   for (let index = 0; index < statItems.length; index++) {
@@ -229,7 +237,7 @@ function fillStats(response) {
     for (const stat of keys) {
       const value = modeStats[stat];
       const statInfo = document.createElement('p');
-      statInfo.textContent = `${stat} ${value}`;
+      statInfo.textContent = `${stat}: ${value}`;
       statItem.appendChild(statInfo);
     }
 
