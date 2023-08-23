@@ -63,7 +63,7 @@ function fetchData() {
       const messages = parseInt(profile.forumData?.messages) || (profile.metaData?.["Сообщения:"] ? parseInt(profile.metaData["Сообщения:"].replace(/\s+/g, '')) : 0);
       
       profileDetails.innerHTML = `
-        <p>Дата регистрации: ${new Date(profile.registration * 1000).toLocaleDateString()}</p>
+        <p>На сервере с ${new Date(profile.registration * 1000).toLocaleDateString()}</p>
         <p>Сообщений: ${messages}</p>
         <p>Рейтинги: 
           <font color="#62A201">${positiveRatings}</font>
