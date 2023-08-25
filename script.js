@@ -57,10 +57,10 @@ function fetchData() {
       const ratingsContainer = document.getElementById('ratings-container');
       
       profileNickname.textContent = profile.nickname;
-      const positiveRatings = parseInt(profile.forumData?.positiveRatings) || (profile.metaData?.["Положительные рейтинги:"] ? parseInt(profile.metaData["Положительные рейтинги:"].replace(/\s+/g, '')) : 0);
-      const neutralRatings = parseInt(profile.forumData?.neutralRatings) || (profile.metaData?.["Нейтральные рейтинги:"] ? parseInt(profile.metaData["Нейтральные рейтинги:"].replace(/\s+/g, '')) : 0);
-      const negativeRatings = parseInt(profile.forumData?.negativeRatings) || (profile.metaData?.["Отрицательные рейтинги:"] ? parseInt(profile.metaData["Отрицательные рейтинги:"].replace(/\s+/g, '')) : 0);
-      const messages = parseInt(profile.forumData?.messages) || (profile.metaData?.["Сообщения:"] ? parseInt(profile.metaData["Сообщения:"].replace(/\s+/g, '')) : 0);
+      const positiveRatings = parseInt(profile.accountData.positiveRatings);
+      const neutralRatings = parseInt(profile.accountData.neutralRatings);
+      const negativeRatings = parseInt(profile.accountData.negativeRatings);
+      const messages = parseInt(profile.accountData.messages);
       
       profileDetails.innerHTML = `
         <p>На сервере с ${new Date(profile.registration * 1000).toLocaleDateString()}</p>
@@ -73,11 +73,11 @@ function fetchData() {
           <font color="#D90B00">${negativeRatings}</font>
         </p>
         <p>Достижений: ${profile.achievements}</p>
-        <p>Баллов: ${parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]) || 0}</p>
+        <p>Баллов: ${parseInt(profile.accountData.points, 10)}</p>
         <p>Звание: ${profile.rankForum}</p>
       `;
       
-      const points = parseInt(profile.forumData?.points, 10) || parseInt(profile.metaData?.["Баллы:"]) || 0;
+      const points = parseInt(profile.accountData.points, 10);
       const registrationDate = new Date(profile.registration * 1000)
 
       const currentDate = new Date();
