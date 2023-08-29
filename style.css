@@ -222,3 +222,48 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
+
+@media (max-width: 900px){
+  body {
+    font-size: xx-small;
+  }
+  img{
+    max-width: 10vw;
+  }
+  
+  .minigame-icon {
+    max-width: 20vw;
+  }
+  
+  .profile-details{
+    max-height: 12vh;
+    overflow-y: auto;
+  }
+  .profile-ratings{
+    max-height: 15vh;
+    overflow: auto;
+  }
+  .rating-container {
+    height: fit-content;
+  }
+  
+  .rating-image {
+    display: block;
+    margin: 0 auto;
+    margin-top: 5px;
+  }
+  
+  .rating-label {
+    margin-top: 5px;
+    text-align: center;
+  }
+  .profile-score-container {
+    max-height: 20vh;
+  }
+
+  /* Стили для контейнера profile-stats */
+  .profile-stats {
+    overflow-x: auto;
+  }
+  
+}
